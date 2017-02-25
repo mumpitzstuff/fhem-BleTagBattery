@@ -198,33 +198,36 @@ sub BleTagBattery_BlockingRun($) {
     my $result;
     my $device;
     my $deviceName;
+    my $deviceList;
     my $deviceAddress = "";
     
     $result = fhem( "list MODE=lan-bluetooth" );
-    
-    Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device list: #$result#";
     
     while ( $result =~ m/^\s*([^\s]+)/g ) {    
         $device = $1;
         
         Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device found. device: $device";
         
-        $result = fhem( "list $device" );
+        $deviceList = fhem( "list $device" );
         
-        if ( $result =~ /STATE\s+present/ ) {        
-            if ( $result =~ m/device_name\s+(.+)$/ ) {
+        if ( $deviceList =~ /STATE\s+present/ ) {        
+            if ( $deviceList =~ m/device_name\s+(.+)$/ ) {
                 $deviceName = $1;
                 
                 Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device name: $deviceName";
                 
-                if ( $result =~ /ADDRESS\s+([^\s]+)/ ) {
+                if ( $deviceList =~ /ADDRESS\s+([^\s]+)/ ) {
                     $deviceAddress = $1;
-                }
                 
-                Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address: $deviceAddress";
+                    Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address: $deviceAddress";
             
-                # $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "00002a19-0000-1000-8000-00805f9b34fb" ) );
-                Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - processing gatttool response for device $device. batteryLevel: $batteryLevel";
+                    # $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "00002a19-0000-1000-8000-00805f9b34fb" ) );
+                    Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - processing gatttool response for device $device. batteryLevel: $batteryLevel";
+                } else {
+                    Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address not found.";
+                }
+            } else {
+                Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device name not found.";
             }
         } else {
             Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device not present.";
