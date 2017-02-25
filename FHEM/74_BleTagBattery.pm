@@ -202,6 +202,8 @@ sub BleTagBattery_BlockingRun($) {
     
     $result = fhem( "list MODE=lan-bluetooth" );
     
+    Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device list: #$result#";
+    
     while ( $result =~ m/^(.+)$/g ) {    
         $device = $1;
         
@@ -233,7 +235,7 @@ sub BleTagBattery_BlockingRun($) {
         }
     }
     
-    return undef;
+    return $name;
 }
 
 sub BleTagBattery_readSensorValue($$$) {
