@@ -25,7 +25,7 @@ sub BleTagBattery_stateRequestTimer($);
 sub BleTagBattery_Set($$@);
 sub BleTagBattery_Run($);
 sub BleTagBattery_BlockingRun($);
-sub BleTagBattery_readSensorValue($$);
+sub BleTagBattery_readSensorValue($$$);
 sub BleTagBattery_convertStringToU8($);
 sub BleTagBattery_BlockingDone($);
 sub BleTagBattery_BlockingAborted($);
@@ -221,7 +221,7 @@ sub BleTagBattery_BlockingRun($) {
                 
                 Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address: $deviceAddress";
             
-                # $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, "00002a19-0000-1000-8000-00805f9b34fb" ) );
+                # $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "00002a19-0000-1000-8000-00805f9b34fb" ) );
                 Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - processing gatttool response for device $device. batteryLevel: $batteryLevel";
             }
         } else {
@@ -236,11 +236,11 @@ sub BleTagBattery_BlockingRun($) {
     return undef;
 }
 
-sub BleTagBattery_readSensorValue($$) {
-    my ($name, $uuid ) = @_;
-    my $hci            = AttrVal( $name, "hciDevice", "hci0" );
+sub BleTagBattery_readSensorValue($$$) {
+    my ($name, $mac, $uuid ) = @_;
+    my $hci                  = AttrVal( $name, "hciDevice", "hci0" );
     my $result;
-    my $loop           = 0;
+    my $loop                 = 0;
 
     do {
         # try to read the value from sensor
