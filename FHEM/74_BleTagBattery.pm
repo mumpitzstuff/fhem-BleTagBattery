@@ -204,7 +204,7 @@ sub BleTagBattery_BlockingRun($) {
     
     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device list: #$result#";
     
-    while ( $result =~ m/^(.+)$/g ) {    
+    while ( $result =~ m/^\s*([^\s]+)/g ) {    
         $device = $1;
         
         Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device found. device: $device";
