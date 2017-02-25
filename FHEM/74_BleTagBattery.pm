@@ -61,9 +61,9 @@ sub BleTagBattery_Define($$) {
 
     my $name = $a[0];
 
-    my $def = $modules{logProxy}{defptr};
+    my $def = $modules{BleTagBattery}{defptr};
   
-    return "BleTagsBattery device already defined as $def->{NAME}." if ( defined($def) ); 
+    return "BleTagBattery device already defined as $def->{NAME}." if ( defined($def) ); 
     
     $hash->{VERSION} = $version;
 
