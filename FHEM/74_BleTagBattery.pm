@@ -222,10 +222,10 @@ sub BleTagBattery_BlockingRun($) {
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address: $deviceAddress";
             
                     if ( $deviceName eq "Gigaset G-tag" ) {
-                        $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "0x180f", "public" ) );
+                        $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--handle=0x001b", "public" ) );
                     }
                     elsif ( $deviceName eq "nut" ) {
-                        $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "0x2a19", "public" ) );
+                        $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "public" ) );
                     }
                     
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - processing gatttool response for device $device. batteryLevel: $batteryLevel";
@@ -248,14 +248,14 @@ sub BleTagBattery_BlockingRun($) {
 }
 
 sub BleTagBattery_readSensorValue($$$$) {
-    my ($name, $mac, $uuid, $type ) = @_;
-    my $hci                         = AttrVal( $name, "hciDevice", "hci0" );
+    my ($name, $mac, $service, $type ) = @_;
+    my $hci                            = AttrVal( $name, "hciDevice", "hci0" );
     my $result;
-    my $loop                        = 0;
+    my $loop                           = 0;
 
     do {
         # try to read the value from sensor
-        $result = qx( gatttool -i $hci -t $type -b $mac --char-read --uuid=$uuid 2>&1 );
+        $result = qx( gatttool -i $hci -t $type -b $mac --char-read $service 2>&1 );
         Log3 $name, 4, "Sub BleTagBattery_readSensorValue ($name) - call gatttool char read loop: $loop, result: $result";
         $loop++;
     }
