@@ -25,7 +25,7 @@ sub BleTagBattery_stateRequestTimer($);
 sub BleTagBattery_Set($$@);
 sub BleTagBattery_Run($);
 sub BleTagBattery_BlockingRun($);
-sub BleTagBattery_readSensorValue($$$);
+sub BleTagBattery_readSensorValue($$$$);
 sub BleTagBattery_convertStringToU8($);
 sub BleTagBattery_BlockingDone($);
 sub BleTagBattery_BlockingAborted($);
@@ -221,7 +221,13 @@ sub BleTagBattery_BlockingRun($) {
                 
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address: $deviceAddress";
             
-                    # $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "00002a19-0000-1000-8000-00805f9b34fb" ) );
+                    if ( $deviceName eq "Gigaset G-tag" ) {
+                        $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "0x001b", "public" ) );
+                    }
+                    elsif ( $deviceName eq "nut" ) {
+                        $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "0x2a19", "public" ) );
+                    }
+                    
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - processing gatttool response for device $device. batteryLevel: $batteryLevel";
                 } else {
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address not found.";
@@ -241,15 +247,15 @@ sub BleTagBattery_BlockingRun($) {
     return $name;
 }
 
-sub BleTagBattery_readSensorValue($$$) {
-    my ($name, $mac, $uuid ) = @_;
-    my $hci                  = AttrVal( $name, "hciDevice", "hci0" );
+sub BleTagBattery_readSensorValue($$$$) {
+    my ($name, $mac, $uuid, $type ) = @_;
+    my $hci                         = AttrVal( $name, "hciDevice", "hci0" );
     my $result;
-    my $loop                 = 0;
+    my $loop                        = 0;
 
     do {
         # try to read the value from sensor
-        $result = qx( gatttool -i $hci -b $mac --char-read --uuid=$uuid 2>&1 );
+        $result = qx( gatttool -i $hci -t $type -b $mac --char-read --uuid=$uuid 2>&1 );
         Log3 $name, 4, "Sub BleTagBattery_readSensorValue ($name) - call gatttool char read loop: $loop, result: $result";
         $loop++;
     }
