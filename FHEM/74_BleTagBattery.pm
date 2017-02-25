@@ -222,7 +222,7 @@ sub BleTagBattery_BlockingRun($) {
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address: $deviceAddress";
             
                     if ( $deviceName eq "Gigaset G-tag" ) {
-                        $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "0x001b", "public" ) );
+                        $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "0x180f", "public" ) );
                     }
                     elsif ( $deviceName eq "nut" ) {
                         $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "0x2a19", "public" ) );
