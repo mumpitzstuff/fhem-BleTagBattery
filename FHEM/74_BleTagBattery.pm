@@ -252,24 +252,30 @@ sub BleTagBattery_readSensorValue($$$$) {
     my $hci                            = AttrVal( $name, "hciDevice", "hci0" );
     my $result;
     my $loop                           = 0;
+    my $value                          = "";
 
     do {
         # try to read the value from sensor
         $result = qx( gatttool -i $hci -t $type -b $mac --char-read $service 2>&1 );
         Log3 $name, 4, "Sub BleTagBattery_readSensorValue ($name) - call gatttool char read loop: $loop, result: $result";
-        $loop++;
+        
+        if ( $result =~ /handle\:.*value\:(.*)/ ) {
+            $value = $1;
+         } elsif ( $result =~ /Characteristic value\/descriptor\:(.*)/) ) {
+            $value = $1;
+        } else {
+            $loop++;
+        }
     }
-    while ( ($loop < 10) && (not $result =~ /handle\:.*value\:(.*)/) );
+    while ( ($loop < 10) && ("" eq $value) );
 
-    if ( defined($1) ) {
-        $result = $1;
-        
+    if ( "" ne $value ) {
         # remove spaces
-        $result =~ s/\s//g;
+        $value =~ s/\s//g;
         
-        Log3 $name, 4, "Sub BleTagBattery_readSensorValue ($name) - processing gatttool response: $result";
+        Log3 $name, 4, "Sub BleTagBattery_readSensorValue ($name) - processing gatttool response: $value";
 
-        return $result;
+        return $value;
     } else {
         Log3 $name, 4, "Sub BleTagBattery_readSensorValue ($name) - invalid gatttool response";
         
