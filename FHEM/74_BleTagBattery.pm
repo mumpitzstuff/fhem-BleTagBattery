@@ -261,7 +261,7 @@ sub BleTagBattery_readSensorValue($$$$) {
         
         if ( $result =~ /handle\:.*value\:(.*)/ ) {
             $value = $1;
-         } elsif ( $result =~ /Characteristic value\/descriptor\:(.*)/) ) {
+         } elsif ( $result =~ /Characteristic value\/descriptor\:(.*)/ ) {
             $value = $1;
         } else {
             $loop++;
