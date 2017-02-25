@@ -211,12 +211,12 @@ sub BleTagBattery_BlockingRun($) {
         $deviceList = fhem( "list $device" );
         
         if ( $deviceList =~ /STATE\s+present/ ) {        
-            if ( $deviceList =~ m/device_name\s+(.+)$/ ) {
+            if ( $deviceList =~ m/device_name\s+(.+)/ ) {
                 $deviceName = $1;
                 
                 Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device name: $deviceName";
                 
-                if ( $deviceList =~ /ADDRESS\s+([^\s]+)/ ) {
+                if ( $deviceList =~ m/ADDRESS\s+([^\s]+)/ ) {
                     $deviceAddress = $1;
                 
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address: $deviceAddress";
