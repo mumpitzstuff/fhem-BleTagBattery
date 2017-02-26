@@ -226,14 +226,14 @@ sub BleTagBattery_BlockingRun($) {
                         $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--handle=0x001b", "public" ) );
                         
                         $targetHash = $defs{$device};
+                        
+                        Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - reading update: $targetHash->{NAME}";
                         readingsSingleUpdate( $targetHash, "batteryLevel", $batteryLevel, 1 );
                     }
                     elsif ( $deviceName eq "nut" ) {
                         $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "public" ) );
                         
                         $targetHash = $defs{$device};
-                        
-                        Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - reading update: $targetHash->{NAME}";
                         readingsSingleUpdate( $targetHash, "batteryLevel", $batteryLevel, 1 );
                     }
                     
