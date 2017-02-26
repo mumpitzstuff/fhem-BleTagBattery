@@ -194,13 +194,15 @@ sub BleTagBattery_Run($) {
 sub BleTagBattery_BlockingRun($) {
     my $name         = shift;
     my $hash         = $defs{$name};
-    #my $targetHash;
+    my $targetHash;
     my $batteryLevel = "";
     my $result;
     my $device;
     my $deviceName;
     my $deviceList;
     my $deviceAddress = "";
+    my $test;
+    my $test1;
     
     $result = fhem( "list MODE=lan-bluetooth" );
     
@@ -225,9 +227,13 @@ sub BleTagBattery_BlockingRun($) {
                     if ( $deviceName eq "Gigaset G-tag" ) {
                         $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--handle=0x001b", "public" ) );
                         
-                        fhem( "setreading $device batteryLevel $batteryLevel" );
+                        $targetHash = $defs{$device};
                         
-                        Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - setreading $device batteryLevel $batteryLevel";
+                        $test = fhem( "setreading $device batteryLevel $batteryLevel" );
+                        readingsSingleUpdate( $hash, "batteryLevel", $batteryLevel, 1 );
+                        $test1 = readingsSingleUpdate( $targetHash, "batteryLevel", $batteryLevel, 1 );
+                        
+                        Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - setreading $device batteryLevel $batteryLevel: $test#$test1";
                         
                         #$targetHash = $defs{$device};
                         
