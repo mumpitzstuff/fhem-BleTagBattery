@@ -227,6 +227,8 @@ sub BleTagBattery_BlockingRun($) {
                         
                         fhem( "setreading $device batteryLevel $batteryLevel" );
                         
+                        Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - setreading $device batteryLevel $batteryLevel";
+                        
                         #$targetHash = $defs{$device};
                         
                         #Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - reading update: $targetHash->{NAME}";
