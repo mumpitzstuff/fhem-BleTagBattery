@@ -13,7 +13,6 @@ use warnings;
 use Blocking;
 
 my $version = "0.0.1";
-my %batteryLevel = ();
 
 
 # Declare functions
@@ -195,15 +194,13 @@ sub BleTagBattery_Run($) {
 sub BleTagBattery_BlockingRun($) {
     my $name         = shift;
     my $hash         = $defs{$name};
-    my $targetHash;
     my $batteryLevel = "";
     my $result;
     my $device;
     my $deviceName;
     my $deviceList;
     my $deviceAddress = "";
-    my $test;
-    my $test1;
+    my $ret           = "";
     
     $result = fhem( "list MODE=lan-bluetooth" );
     
@@ -228,12 +225,12 @@ sub BleTagBattery_BlockingRun($) {
                     if ( $deviceName eq "Gigaset G-tag" ) {
                         $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--handle=0x001b", "public" ) );
                         
-                        $batteryLevel{$device} = $batteryLevel;
+                        $ret .= "|$deviceName|$batteryLevel";
                     }
                     elsif ( $deviceName eq "nut" ) {
                         $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "public" ) );
                         
-                        $batteryLevel{$device} = $batteryLevel;
+                        $ret .= "|$deviceName|$batteryLevel";
                     } else {
                         Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - tag not supported";
                     }
@@ -254,7 +251,7 @@ sub BleTagBattery_BlockingRun($) {
         }
     }
     
-    return $name;
+    return $name.$ret;
 }
 
 sub BleTagBattery_readSensorValue($$$$) {
@@ -306,18 +303,22 @@ sub BleTagBattery_convertStringToU8($) {
 }
 
 sub BleTagBattery_BlockingDone($) {
-    my $name = shift;
+    my @param = split( "\\|", shift );
+    my $name = $param[0];
     my $hash = $defs{$name};
+    my $i;
     
     delete($hash->{helper}{RUNNING_PID});
 
     Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - helper disabled. abort" if ( $hash->{helper}{DISABLED} );
     return if ( $hash->{helper}{DISABLED} );
     
-    foreach ( keys(%batteryLevel) ) {
-        my $targetHash = $defs{$_};
+    for ($i = 0; $i < ((@param - 1) / 2); $i++) {
+        my $targetHash = $defs{$param[1 + ($i * 2)]};
         
-        readingsSingleUpdate( $targetHash, "batteryLevel", $batteryLevel{$_}, 1 );    
+        if ( defined($targetHash) ) {
+            readingsSingleUpdate( $targetHash, "batteryLevel", $param[2 + ($i * 2)], 1 ); 
+        }
     }
 
     Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - done";
