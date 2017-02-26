@@ -309,15 +309,15 @@ sub BleTagBattery_BlockingDone($) {
     Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - helper disabled. abort" if ( $hash->{helper}{DISABLED} );
     return if ( $hash->{helper}{DISABLED} );
     
-    Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - number of parameters: ".scalar(@param);
-    
     for ($i = 0; $i < ((scalar(@param) - 1) / 2); $i++) {
         my $targetHash = $defs{$param[1 + ($i * 2)]};
         
-        Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - set reading of device: $param[1 + ($i * 2)]";
+        Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - set reading batteryLevel of device: $param[1 + ($i * 2)]";
         
         if ( defined($targetHash) ) {
             readingsSingleUpdate( $targetHash, "batteryLevel", $param[2 + ($i * 2)], 1 ); 
+        } else {
+            Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - target hash not found.";
         }
     }
 
