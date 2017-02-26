@@ -225,12 +225,12 @@ sub BleTagBattery_BlockingRun($) {
                     if ( $deviceName eq "Gigaset G-tag" ) {
                         $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--handle=0x001b", "public" ) );
                         
-                        $ret .= "|$deviceName|$batteryLevel";
+                        $ret .= "|$device|$batteryLevel";
                     }
                     elsif ( $deviceName eq "nut" ) {
                         $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "public" ) );
                         
-                        $ret .= "|$deviceName|$batteryLevel";
+                        $ret .= "|$device|$batteryLevel";
                     } else {
                         Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - tag not supported";
                     }
@@ -309,9 +309,9 @@ sub BleTagBattery_BlockingDone($) {
     Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - helper disabled. abort" if ( $hash->{helper}{DISABLED} );
     return if ( $hash->{helper}{DISABLED} );
     
-    Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - number of parameters: @param";
+    Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - number of parameters: ".scalar(@param);
     
-    for ($i = 0; $i < ((@param - 1) / 2); $i++) {
+    for ($i = 0; $i < ((scalar(@param) - 1) / 2); $i++) {
         my $targetHash = $defs{$param[1 + ($i * 2)]};
         
         Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - set reading of device: $param[1 + ($i * 2)]";
