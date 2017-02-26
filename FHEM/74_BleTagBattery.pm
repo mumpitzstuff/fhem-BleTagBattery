@@ -143,8 +143,6 @@ sub BleTagBattery_stateRequestTimer($) {
 
     RemoveInternalTimer( $hash );
 
-    InternalTimer( gettimeofday() + 86400 + int(rand(30)), "BleTagBattery_stateRequestTimer", $hash, 1 );
-    
     if ( !IsDisabled($name) ) {
         readingsSingleUpdate( $hash, "state", "active", 1 );
 
@@ -152,6 +150,8 @@ sub BleTagBattery_stateRequestTimer($) {
     } else {
         readingsSingleUpdate( $hash, "state", "disabled", 1 );
     }
+    
+    InternalTimer( gettimeofday() + 21600 + int(rand(30)), "BleTagBattery_stateRequestTimer", $hash, 1 );
 
     Log3 $name, 5, "Sub BleTagBattery_stateRequestTimer ($name) - state request timer called";
     
@@ -211,7 +211,7 @@ sub BleTagBattery_BlockingRun($) {
         
         $deviceList = fhem( "list $device" );
         
-        if ( $deviceList =~ /STATE\s+present/ ) {        
+        if ( $deviceList =~ m/STATE\s+present/ ) {        
             if ( $deviceList =~ m/device_name\s+(.+)/ ) {
                 $deviceName = $1;
                 
@@ -244,10 +244,6 @@ sub BleTagBattery_BlockingRun($) {
             }
         } else {
             Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device not present.";
-            
-            RemoveInternalTimer( $hash );
-
-            InternalTimer( gettimeofday() + 900 + int(rand(30)), "BleTagBattery_stateRequestTimer", $hash, 1 );
         }
     }
     
@@ -313,8 +309,12 @@ sub BleTagBattery_BlockingDone($) {
     Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - helper disabled. abort" if ( $hash->{helper}{DISABLED} );
     return if ( $hash->{helper}{DISABLED} );
     
+    Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - number of parameters: @param";
+    
     for ($i = 0; $i < ((@param - 1) / 2); $i++) {
         my $targetHash = $defs{$param[1 + ($i * 2)]};
+        
+        Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - set reading of device: $param[1 + ($i * 2)]";
         
         if ( defined($targetHash) ) {
             readingsSingleUpdate( $targetHash, "batteryLevel", $param[2 + ($i * 2)], 1 ); 
