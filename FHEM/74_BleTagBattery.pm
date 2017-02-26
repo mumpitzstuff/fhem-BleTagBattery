@@ -227,13 +227,13 @@ sub BleTagBattery_BlockingRun($) {
                     if ( $deviceName eq "Gigaset G-tag" ) {
                         $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--handle=0x001b", "public" ) );
                         
-                        $targetHash = $defs{$device};
+                        #$targetHash = $defs{$device};
                         
-                        $test = fhem( "setreading $device batteryLevel $batteryLevel" );
-                        readingsSingleUpdate( $hash, "batteryLevel", $batteryLevel, 1 );
-                        $test1 = readingsSingleUpdate( $targetHash, "batteryLevel", $batteryLevel, 1 );
+                        #$test = fhem( "setreading $device batteryLevel $batteryLevel" );
+                        #readingsSingleUpdate( $hash, "batteryLevel", $batteryLevel, 1 );
+                        #$test1 = readingsSingleUpdate( $targetHash, "batteryLevel", $batteryLevel, 1 );
                         
-                        Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - setreading $device batteryLevel $batteryLevel: $test#$test1";
+                        #Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - setreading $device batteryLevel $batteryLevel: $test#$test1";
                         
                         #$targetHash = $defs{$device};
                         
@@ -319,11 +319,15 @@ sub BleTagBattery_convertStringToU8($) {
 sub BleTagBattery_BlockingDone($) {
     my $name = shift;
     my $hash = $defs{$name};
+    my $test = $defs{"GTAG_ACHIM"};
 
     delete($hash->{helper}{RUNNING_PID});
 
     Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - helper disabled. abort" if ( $hash->{helper}{DISABLED} );
     return if ( $hash->{helper}{DISABLED} );
+    
+    readingsSingleUpdate( $hash, "batteryLevel", 55, 1 );
+    readingsSingleUpdate( $test, "batteryLevel", 55, 1 );
 
     Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - done";
     
