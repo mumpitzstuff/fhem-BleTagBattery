@@ -12,7 +12,7 @@ use strict;
 use warnings;
 use Blocking;
 
-my $version = "0.0.1";
+my $version = "0.0.2";
 
 
 # Declare functions
@@ -45,10 +45,7 @@ sub BleTagBattery_Initialize($) {
                           "hciDevice:hci0,hci1,hci2 ".
                           $readingFnAttributes;
 
-    foreach my $d(sort keys %{$modules{BleTagBattery}{defptr}}) {
-        my $hash = $modules{BleTagBattery}{defptr}{$d};
-        $hash->{VERSION} = $version;
-    }
+    $hash->{VERSION} = $version;
     
     return undef;
 }
@@ -61,17 +58,14 @@ sub BleTagBattery_Define($$) {
 
     my $name = $a[0];
 
-    #my $def = $modules{BleTagBattery}{defptr};
-  
-    #return "BleTagBattery device already defined as $def->{NAME}." if ( defined($def) ); 
+    my $d = $modules{BleTagBattery}{defptr};
+    return "BleTagBattery device already defined as ".$d->{NAME} if ( defined($d) ); 
     
     $hash->{VERSION} = $version;
 
     $modules{BleTagBattery}{defptr} = $hash;
     readingsSingleUpdate( $hash, "state", "initialized", 0 );
     
-    RemoveInternalTimer( $hash );
-
     if ( $init_done ) {
         BleTagBattery_stateRequestTimer( $hash );
     } else {
@@ -141,8 +135,6 @@ sub BleTagBattery_stateRequestTimer($) {
     my $name = $hash->{NAME};
 
 
-    RemoveInternalTimer( $hash );
-
     if ( !IsDisabled($name) ) {
         readingsSingleUpdate( $hash, "state", "active", 1 );
 
@@ -192,24 +184,30 @@ sub BleTagBattery_Run($) {
 }
 
 sub BleTagBattery_BlockingRun($) {
-    my $name         = shift;
-    my $hash         = $defs{$name};
-    my $batteryLevel = "";
+    my $name           = shift;
+    my $hash           = $defs{$name};
+    my $batteryLevel   = "";
     my $result;
     my $device;
     my $deviceName;
     my $deviceList;
-    my $deviceAddress = "";
-    my $ret           = "";
+    my $deviceAddress  = "";
+    my $isSingleDevice = 0;
+    my $ret            = "";
     
-    $result = fhem( "list MODE=lan-bluetooth" );
+    $result = fhem( "list MODE=lan-bluetooth", 1 );
     
-    while ( $result =~ m/([^\s]+)/g ) {    
+    if ( $result =~ /^Internals:/ ) {
+        $isSingleDevice = 1;
+    }
+    
+    while ( (0 == $isSingleDevice && $result =~ m/([^\s]+)/g) ||
+            (1 == $isSingleDevice && $result =~ m/NAME\s+([^\s]+)/g) ) {    
         $device = $1;
         
         Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device found. device: $device";
         
-        $deviceList = fhem( "list $device" );
+        $deviceList = fhem( "list $device", 1 );
         
         if ( $deviceList =~ m/STATE\s+present/ ) {        
             if ( $deviceList =~ m/device_name\s+(.+)/ ) {
