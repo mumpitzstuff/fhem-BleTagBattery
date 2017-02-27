@@ -20,7 +20,7 @@
   <br><br>
   <b>Usage:</b>
   The module automatically try to reach all BLE tags every 6 hours and to update the reading batteryLevel for each tag directly within the tag device. You 
-  can manually trigger the update with: set <name of device> statusRequest.<br>
+  can manually trigger the update with: set &lt;name of device&gt; statusRequest.<br>
   <br><br>
   <b>Supported BLE tags:</b>
   <ul>
