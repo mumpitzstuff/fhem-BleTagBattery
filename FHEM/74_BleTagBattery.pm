@@ -223,8 +223,7 @@ sub BleTagBattery_BlockingRun($) {
                 
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address: $deviceAddress";
             
-                    if ( $deviceName eq "test" ) {
-                    #if ( $deviceName eq "Gigaset G-tag" ) {
+                    if ( $deviceName eq "Gigaset G-tag" ) {
                         $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--handle=0x001b", "public" ) );
                         
                         $ret .= "|$device|$batteryLevel|$setting";
@@ -239,8 +238,7 @@ sub BleTagBattery_BlockingRun($) {
                             if ( "" eq $batteryLevel ) {
                                 Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - try to connect with random";
                                 
-                                $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--handle=0x001b", "public" ) );
-                                #$batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "random" ) );
+                                $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "random" ) );
                                 if ( "" ne $batteryLevel ) {
                                     $setting = "random";
                                 }
