@@ -241,10 +241,12 @@ sub BleTagBattery_BlockingRun($) {
                                 $hash->{helper}{$device} = "public" if ( "" ne $batteryLevel );
                             }
                         }
-                         
+                        
+                        if ( "" eq $batteryLevel ) {
+                            Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - tag not supported";
+                        }
+                        
                         $ret .= "|$device|$batteryLevel";
-                    } else {
-                        Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - tag not supported";
                     }
                     
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - processing gatttool response for device $device. batteryLevel: $batteryLevel";

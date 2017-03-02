@@ -8,7 +8,7 @@
     <li>Gattool is required to use this module. Be sure that bluez is installed (sudo apt-get install bluez).</li>
     <li>BLE tags must be registered as PRESENCE devices of type lan-bluetooth.</li>
   </ul>
-  <br><br>
+  <br>
   <b>Installation:</b>
   <ul>
     <li>be sure that bluez is installed: sudo apt-get install bluez</li>
@@ -17,7 +17,7 @@
     <li>restart fhem: shutdown restart</li>
     <li>define a new device: define &lt;name of device&gt; BleTagBattery</li>
   </ul>
-  <br><br>
+  <br>
   <b>Usage:</b>
   The module automatically try to reach all BLE tags every 6 hours and to update the reading batteryLevel and battery for each tag directly within the tag device. You 
   can manually trigger the update with: set &lt;name of device&gt; statusRequest.
@@ -34,7 +34,7 @@
     <li>disable: disable the BleTagBattery device</li>
     <li>hciDevice: bluetooth device (default: hci0)</li>
   </ul>
-  <br><br>
+  <br>
   <b>Supported BLE tags:</b>
   <ul>
     <li>Gigaset G-Tag</li>
