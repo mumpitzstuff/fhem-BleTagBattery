@@ -174,7 +174,7 @@ sub BleTagBattery_Run($) {
         Log3 $name, 4, "Sub BleTagBattery_Run ($name) - start blocking call";
     
         $hash->{helper}{RUNNING_PID} = BlockingCall( "BleTagBattery_BlockingRun", $name, 
-                                                     "BleTagBattery_BlockingDone", 60, 
+                                                     "BleTagBattery_BlockingDone", 240, 
                                                      "BleTagBattery_BlockingAborted", $hash );
     } else {
         Log3 $name, 4, "Sub BleTagBattery_Run ($name) - blocking call already running";    
@@ -220,7 +220,8 @@ sub BleTagBattery_BlockingRun($) {
                 
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address: $deviceAddress";
             
-                    if ( $deviceName eq "Gigaset G-tag" ) {
+                    if ( $deviceName eq "test" ) {
+                    #if ( $deviceName eq "Gigaset G-tag" ) {
                         $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--handle=0x001b", "public" ) );
                         
                         $ret .= "|$device|$batteryLevel";
@@ -231,7 +232,8 @@ sub BleTagBattery_BlockingRun($) {
                         } else {
                             # try to connect with random and store this setting if successful
                             if ( "" eq $batteryLevel ) {
-                                $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "random" ) );
+                                $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--handle=0x001b", "public" ) );
+                                #$batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "random" ) );
                                 $hash->{helper}{$device} = "random" if ( "" ne $batteryLevel );
                             }
                             
