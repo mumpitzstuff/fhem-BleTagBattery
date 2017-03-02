@@ -186,7 +186,7 @@ sub BleTagBattery_Run($) {
 sub BleTagBattery_BlockingRun($) {
     my $name           = shift;
     my $hash           = $defs{$name};
-    my $batteryLevel   = "";
+    my $batteryLevel;
     my $result;
     my $device;
     my $deviceName;
@@ -217,6 +217,7 @@ sub BleTagBattery_BlockingRun($) {
                 
                 if ( $deviceList =~ m/ADDRESS\s+([^\s]+)/ ) {
                     $deviceAddress = $1;
+                    $batteryLevel = "";
                 
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address: $deviceAddress";
             
@@ -228,10 +229,14 @@ sub BleTagBattery_BlockingRun($) {
                     } else {
                         # settings already available for this device?
                         if ( defined($hash->{helper}{$device}) ) {
+                            Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - tag already saved in hash";
+                            
                             $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", $hash->{helper}{$device} ) );
                         } else {
                             # try to connect with random and store this setting if successful
                             if ( "" eq $batteryLevel ) {
+                                Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - try to connect with random";
+                                
                                 $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--handle=0x001b", "public" ) );
                                 #$batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "random" ) );
                                 $hash->{helper}{$device} = "random" if ( "" ne $batteryLevel );
@@ -239,6 +244,8 @@ sub BleTagBattery_BlockingRun($) {
                             
                             # try to connect with public and store this setting if successful
                             if ( "" eq $batteryLevel ) {
+                                Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - try to connect with public";
+                                
                                 $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "public" ) );
                                 $hash->{helper}{$device} = "public" if ( "" ne $batteryLevel );
                             }
