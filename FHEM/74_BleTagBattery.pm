@@ -242,7 +242,7 @@ sub BleTagBattery_BlockingRun($) {
                                 if ( "" ne $batteryLevel ) {
                                     $hash->{helper}{$device} = "random";
                                     
-                                    Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - connection settings stored in hash";
+                                    Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - connection settings stored in hash: ".$hash->{helper}{$device};
                                 }
                             }
                             
@@ -254,7 +254,7 @@ sub BleTagBattery_BlockingRun($) {
                                 if ( "" ne $batteryLevel ) {
                                     $hash->{helper}{$device} = "public";
                                     
-                                    Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - connection settings stored in hash";
+                                    Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - connection settings stored in hash: ".$hash->{helper}{$device};
                                 }
                             }
                         }
