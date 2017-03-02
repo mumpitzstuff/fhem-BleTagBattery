@@ -239,7 +239,11 @@ sub BleTagBattery_BlockingRun($) {
                                 
                                 $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--handle=0x001b", "public" ) );
                                 #$batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "random" ) );
-                                $hash->{helper}{$device} = "random" if ( "" ne $batteryLevel );
+                                if ( "" ne $batteryLevel ) {
+                                    $hash->{helper}{$device} = "random";
+                                    
+                                    Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - connection settings stored in hash";
+                                }
                             }
                             
                             # try to connect with public and store this setting if successful
@@ -247,7 +251,11 @@ sub BleTagBattery_BlockingRun($) {
                                 Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - try to connect with public";
                                 
                                 $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "public" ) );
-                                $hash->{helper}{$device} = "public" if ( "" ne $batteryLevel );
+                                if ( "" ne $batteryLevel ) {
+                                    $hash->{helper}{$device} = "public";
+                                    
+                                    Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - connection settings stored in hash";
+                                }
                             }
                         }
                         
@@ -335,7 +343,7 @@ sub BleTagBattery_BlockingDone($) {
     for ($i = 0; $i < ((scalar(@param) - 1) / 2); $i++) {
         my $targetHash = $defs{$param[1 + ($i * 2)]};
         
-        Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - set reading batteryLevel of device: $param[1 + ($i * 2)]";
+        Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - set readings batteryLevel and battery of device: $param[1 + ($i * 2)]";
         
         if ( defined($targetHash) ) {
             readingsBeginUpdate( $targetHash );
