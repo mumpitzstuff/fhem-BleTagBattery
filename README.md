@@ -2,7 +2,7 @@
 <ul>
   <u><b>BleTagBattery - Update batteryLevel for all BLE tags</b></u>
   <br>
-  This module can be used to update the Reading batteryLevel for all bluetooth low energy tags registered as PRESENCE devices.<br><br>
+  This module can be used to update the Reading batteryLevel and battery for all bluetooth low energy tags registered as PRESENCE devices.<br><br>
   <b>Requirements:</b><br>
   <ul>
     <li>Gattool is required to use this module. Be sure that bluez is installed (sudo apt-get install bluez).</li>
@@ -19,13 +19,26 @@
   </ul>
   <br><br>
   <b>Usage:</b>
-  The module automatically try to reach all BLE tags every 6 hours and to update the reading batteryLevel for each tag directly within the tag device. You 
-  can manually trigger the update with: set &lt;name of device&gt; statusRequest.<br>
+  The module automatically try to reach all BLE tags every 6 hours and to update the reading batteryLevel and battery for each tag directly within the tag device. You 
+  can manually trigger the update with: set &lt;name of device&gt; statusRequest.
+  <br><br>
+  <b>Pitfalls:</b>
+  This module does not work well together with lepresenced on a single bluetooth dongle. In the best case lepresenced and this module should run on 
+  separate bluetooth dongles. If this is not possible and you do not get any battery readings, try to activate the attribute verbose 5 within this 
+  module and analyze the logfile. You can also try to increase the constant RETRY_SLEEP to something between 2-5 within the lepresenced deamon (stop 
+  the deamon, edit the lepresenced script and restart the deamon). This will give this module more time to retrieve the battery value from the BLE
+  tags before the lepresenced deamon try to restart the bluetooth dongle again.
+  <br><br>
+  <b>Attributes:</b>
+  <ul>
+    <li>disable: disable the BleTagBattery device</li>
+    <li>hciDevice: bluetooth device (default: hci0)</li>
+  </ul>
   <br><br>
   <b>Supported BLE tags:</b>
   <ul>
     <li>Gigaset G-Tag</li>
-    <li>nut (possible supported but not tested)</li>
+    <li>general handler for many other tags</li>
     <li>more to come</li>
   </ul>
 </ul>
