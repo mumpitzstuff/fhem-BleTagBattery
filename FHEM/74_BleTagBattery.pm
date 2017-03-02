@@ -228,7 +228,7 @@ sub BleTagBattery_BlockingRun($) {
                         $ret .= "|$device|$batteryLevel";
                     } else {
                         # settings already available for this device?
-                        if ( defined($hash->{helper}{$device}) ) {
+                        if ( exists($hash->{helper}{$device}) ) {
                             Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - tag already saved in hash";
                             
                             $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", $hash->{helper}{$device} ) );
