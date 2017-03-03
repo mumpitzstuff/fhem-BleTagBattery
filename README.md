@@ -25,9 +25,10 @@
   <b>Pitfalls:</b>
   This module does not work well together with lepresenced on a single bluetooth dongle. In the best case lepresenced and this module should run on 
   separate bluetooth dongles. If this is not possible and you do not get any battery readings, try to activate the attribute verbose 5 within this 
-  module and analyze the logfile. You can also try to increase the constant RETRY_SLEEP to something between 2-5 within the lepresenced deamon (stop 
-  the deamon, edit the lepresenced script and restart the deamon). This will give this module more time to retrieve the battery value from the BLE
-  tags before the lepresenced deamon try to restart the bluetooth dongle again.
+  module and analyze the logfile. You can also try to increase the constant RETRY_SLEEP (start with high values like 30 and decrease the value if 
+  possible) within the lepresenced deamon (stop the deamon, edit the lepresenced script and restart the deamon). This will give this module more time 
+  to retrieve the battery value from the BLE tags before the lepresenced deamon try to restart the bluetooth dongle again. The more BLE tags you are using,
+  the higher the value for RETRY_SLEEP should be.
   <br><br>
   <b>Attributes:</b>
   <ul>

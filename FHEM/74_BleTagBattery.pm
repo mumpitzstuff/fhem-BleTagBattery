@@ -223,48 +223,33 @@ sub BleTagBattery_BlockingRun($) {
                 
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address: $deviceAddress";
             
-                    if ( $deviceName eq "Gigaset G-tag" ) {
-                        $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "public" ) );
-                        #$batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--handle=0x001b", "public" ) );
+                    # settings already available for this device?
+                    if ( defined($hash->{helper}{$device}) ) {
+                        Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - tag already saved in hash";
                         
-                        if ( "" eq $batteryLevel ) {
-                            Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - G-Tag not available";
-                        } else {
-                            $ret .= "|$device|$batteryLevel|$setting";
-                        }
+                        $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", $hash->{helper}{$device} ) );
                     } else {
-                        # settings already available for this device?
-                        if ( defined($hash->{helper}{$device}) ) {
-                            Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - tag already saved in hash";
+                        # try to connect with public and store this setting if successful
+                        Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - try to connect with public";
                             
-                            $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", $hash->{helper}{$device} ) );
+                        $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "public" ) );
+                        if ( "" ne $batteryLevel ) {
+                            $setting = "public";
                         } else {
                             # try to connect with random and store this setting if successful
-                            if ( "" eq $batteryLevel ) {
-                                Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - try to connect with random";
-                                
-                                $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "random" ) );
-                                if ( "" ne $batteryLevel ) {
-                                    $setting = "random";
-                                }
-                            }
+                            Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - try to connect with random";
                             
-                            # try to connect with public and store this setting if successful
-                            if ( "" eq $batteryLevel ) {
-                                Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - try to connect with public";
-                                
-                                $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "public" ) );
-                                if ( "" ne $batteryLevel ) {
-                                    $setting = "public";
-                                }
+                            $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "random" ) );
+                            if ( "" ne $batteryLevel ) {
+                                $setting = "random";
                             }
                         }
-                        
-                        if ( "" eq $batteryLevel ) {
-                            Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - tag not supported";
-                        } else {
-                            $ret .= "|$device|$batteryLevel|$setting";
-                        }
+                    }
+                    
+                    if ( "" eq $batteryLevel ) {
+                        Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - tag not supported";
+                    } else {
+                        $ret .= "|$device|$batteryLevel|$setting";
                     }
                     
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - processing gatttool response for device $device. batteryLevel: $batteryLevel";
