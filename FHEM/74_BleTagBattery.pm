@@ -224,9 +224,14 @@ sub BleTagBattery_BlockingRun($) {
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address: $deviceAddress";
             
                     if ( $deviceName eq "Gigaset G-tag" ) {
-                        $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--handle=0x001b", "public" ) );
+                        $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "public" ) );
+                        #$batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--handle=0x001b", "public" ) );
                         
-                        $ret .= "|$device|$batteryLevel|$setting";
+                        if ( "" eq $batteryLevel ) {
+                            Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - G-Tag not available";
+                        } else {
+                            $ret .= "|$device|$batteryLevel|$setting";
+                        }
                     } else {
                         # settings already available for this device?
                         if ( defined($hash->{helper}{$device}) ) {
