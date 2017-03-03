@@ -219,7 +219,7 @@ sub BleTagBattery_BlockingRun($) {
                 if ( $deviceList =~ m/ADDRESS\s+([^\s]+)/ ) {
                     $deviceAddress = $1;
                     $batteryLevel = "";
-                    $setting = "";
+                    $setting = "none";
                 
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address: $deviceAddress";
             
@@ -339,7 +339,7 @@ sub BleTagBattery_BlockingDone($) {
     for ($i = 0; $i < ((scalar(@param) - 1) / 3); $i++) {
         my $targetHash = $defs{$param[1 + ($i * 3)]};
         
-        if ( "" ne $param[3 + ($i * 3)] ) {
+        if ( "none" ne $param[3 + ($i * 3)] ) {
             Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - setting saved into hash: $param[3 + ($i * 3)]";
         
             $hash->{helper}{$param[1 + ($i * 3)]} = $param[3 + ($i * 3)];
