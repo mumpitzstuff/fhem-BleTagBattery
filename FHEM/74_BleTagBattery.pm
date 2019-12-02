@@ -12,7 +12,7 @@ use strict;
 use warnings;
 use Blocking;
 
-my $version = "0.0.3";
+my $version = "0.0.4";
 
 
 # Declare functions
@@ -36,7 +36,7 @@ sub BleTagBattery_BlockingAborted($);
 sub BleTagBattery_Initialize($) {
     my $hash = shift;
 
-    
+
     $hash->{SetFn}      = "BleTagBattery_Set";
     $hash->{DefFn}      = "BleTagBattery_Define";
     $hash->{UndefFn}    = "BleTagBattery_Undef";
@@ -46,7 +46,7 @@ sub BleTagBattery_Initialize($) {
                           $readingFnAttributes;
 
     $hash->{VERSION} = $version;
-    
+
     return undef;
 }
 
@@ -59,13 +59,13 @@ sub BleTagBattery_Define($$) {
     my $name = $a[0];
 
     my $d = $modules{BleTagBattery}{defptr};
-    return "BleTagBattery device already defined as ".$d->{NAME} if ( defined($d) ); 
-    
+    return "BleTagBattery device already defined as ".$d->{NAME} if ( defined($d) );
+
     $hash->{VERSION} = $version;
 
     $modules{BleTagBattery}{defptr} = $hash;
     readingsSingleUpdate( $hash, "state", "initialized", 0 );
-    
+
     if ( $init_done ) {
         BleTagBattery_stateRequestTimer( $hash );
     } else {
@@ -83,11 +83,11 @@ sub BleTagBattery_Undef($$) {
 
 
     RemoveInternalTimer( $hash );
-    BlockingKill( $hash->{helper}{RUNNING_PID} ) if ( defined($hash->{helper}{RUNNING_PID}) ); 
+    BlockingKill( $hash->{helper}{RUNNING_PID} ) if ( defined($hash->{helper}{RUNNING_PID}) );
 
     delete( $modules{BleTagBattery}{defptr} );
     Log3 $name, 3, "Sub BleTagBattery_Undef ($name) - device deleted";
-    
+
     return undef;
 }
 
@@ -99,12 +99,12 @@ sub BleTagBattery_Attr(@) {
     if ( $attrName eq "disable" ) {
         if ( $cmd eq "set" and $attrVal eq "1" ) {
             readingsSingleUpdate( $hash, "state", "disabled", 1 );
-            
+
             Log3 $name, 3, "BleTagBattery_Attr ($name) - device disabled";
         }
         elsif ( $cmd eq "del" ) {
             readingsSingleUpdate( $hash, "state", "active", 1 );
-            
+
             Log3 $name, 3, "Sub BleTagBattery_Attr ($name) - device enabled";
         }
     }
@@ -124,9 +124,9 @@ sub BleTagBattery_stateRequest($) {
     } else {
         readingsSingleUpdate( $hash, "state", "disabled", 1 );
     }
-    
+
     Log3 $name, 5, "Sub BleTagBattery_stateRequest ($name) - state request called";
-    
+
     return undef;
 }
 
@@ -142,11 +142,11 @@ sub BleTagBattery_stateRequestTimer($) {
     } else {
         readingsSingleUpdate( $hash, "state", "disabled", 1 );
     }
-    
+
     InternalTimer( gettimeofday() + 21600 + int(rand(30)), "BleTagBattery_stateRequestTimer", $hash, 1 );
 
     Log3 $name, 5, "Sub BleTagBattery_stateRequestTimer ($name) - state request timer called";
-    
+
     return undef;
 }
 
@@ -154,7 +154,7 @@ sub BleTagBattery_Set($$@) {
     my ($hash, $name, @aa)  = @_;
     my ($cmd, $arg)         = @aa;
 
-    
+
     if ( $cmd eq 'statusRequest' ) {
         BleTagBattery_stateRequest( $hash );
     } else {
@@ -168,18 +168,18 @@ sub BleTagBattery_Set($$@) {
 sub BleTagBattery_Run($) {
     my ( $hash, $cmd )  = @_;
     my $name            = $hash->{NAME};
-    
-    
+
+
     if ( not exists($hash->{helper}{RUNNING_PID}) ) {
         Log3 $name, 4, "Sub BleTagBattery_Run ($name) - start blocking call";
-    
-        $hash->{helper}{RUNNING_PID} = BlockingCall( "BleTagBattery_BlockingRun", $name, 
-                                                     "BleTagBattery_BlockingDone", 240, 
+
+        $hash->{helper}{RUNNING_PID} = BlockingCall( "BleTagBattery_BlockingRun", $name,
+                                                     "BleTagBattery_BlockingDone", 300,
                                                      "BleTagBattery_BlockingAborted", $hash );
     } else {
-        Log3 $name, 4, "Sub BleTagBattery_Run ($name) - blocking call already running";    
+        Log3 $name, 4, "Sub BleTagBattery_Run ($name) - blocking call already running";
     }
-    
+
     return undef;
 }
 
@@ -195,63 +195,63 @@ sub BleTagBattery_BlockingRun($) {
     my $deviceAddress  = "";
     my $isSingleDevice = 0;
     my $ret            = "";
-    
+
     $result = fhem( "list MODE=lan-bluetooth", 1 );
-    
+
     if ( $result =~ /^Internals:/ ) {
         $isSingleDevice = 1;
     }
-    
+
     while ( (0 == $isSingleDevice && $result =~ m/([^\s]+)/g) ||
-            (1 == $isSingleDevice && $result =~ m/NAME\s+([^\s]+)/g) ) {    
+            (1 == $isSingleDevice && $result =~ m/NAME\s+([^\s]+)/g) ) {
         $device = $1;
-        
+
         Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device found. device: $device";
-        
+
         $deviceList = fhem( "list $device", 1 );
-        
-        if ( $deviceList =~ m/STATE\s+present/ ) {        
+
+        if ( $deviceList =~ m/\s+STATE\s+present/ ) {
             if ( $deviceList =~ m/device_name\s+(.+)/ ) {
                 $deviceName = $1;
-                
+
                 Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device name: $deviceName";
-                
+
                 if ( $deviceList =~ m/ADDRESS\s+([^\s]+)/ ) {
                     $deviceAddress = $1;
                     $batteryLevel = "";
                     $setting = "none";
-                
+
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address: $deviceAddress";
-            
+
                     # settings already available for this device?
                     if ( defined($hash->{helper}{$device}) ) {
                         Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - tag already saved in hash";
-                        
+
                         $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", $hash->{helper}{$device} ) );
                     } else {
                         # try to connect with public and store this setting if successful
                         Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - try to connect with public";
-                            
+
                         $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "public" ) );
                         if ( "" ne $batteryLevel ) {
                             $setting = "public";
                         } else {
                             # try to connect with random and store this setting if successful
                             Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - try to connect with random";
-                            
+
                             $batteryLevel = BleTagBattery_convertStringToU8( BleTagBattery_readSensorValue( $name, $deviceAddress, "--uuid=0x2a19", "random" ) );
                             if ( "" ne $batteryLevel ) {
                                 $setting = "random";
                             }
                         }
                     }
-                    
+
                     if ( "" eq $batteryLevel ) {
                         Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - tag not supported";
                     } else {
                         $ret .= "|$device|$batteryLevel|$setting";
                     }
-                    
+
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - processing gatttool response for device $device. batteryLevel: $batteryLevel";
                 } else {
                     Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device address not found.";
@@ -263,7 +263,7 @@ sub BleTagBattery_BlockingRun($) {
             Log3 $name, 4, "Sub BleTagBattery_BlockingRun ($name) - device not present.";
         }
     }
-    
+
     return $name.$ret;
 }
 
@@ -278,7 +278,7 @@ sub BleTagBattery_readSensorValue($$$$) {
         # try to read the value from sensor
         $result = qx( gatttool -i $hci -t $type -b $mac --char-read $service 2>&1 );
         Log3 $name, 4, "Sub BleTagBattery_readSensorValue ($name) - call gatttool char read loop: $loop, result: $result";
-        
+
         if ( $result =~ /handle\:.*value\:(.*)/ ) {
             $value = $1;
          } elsif ( $result =~ /Characteristic value\/descriptor\:(.*)/ ) {
@@ -287,18 +287,18 @@ sub BleTagBattery_readSensorValue($$$$) {
             $loop++;
         }
     }
-    while ( ($loop < 5) && ("" eq $value) );
+    while ( ($loop < 1) && ("" eq $value) );
 
     if ( "" ne $value ) {
         # remove spaces
         $value =~ s/\s//g;
-        
+
         Log3 $name, 4, "Sub BleTagBattery_readSensorValue ($name) - processing gatttool response: $value";
 
         return $value;
     } else {
         Log3 $name, 4, "Sub BleTagBattery_readSensorValue ($name) - invalid gatttool response";
-        
+
         # return empty string in case of an error
         return "";
     }
@@ -320,23 +320,23 @@ sub BleTagBattery_BlockingDone($) {
     my $name = $param[0];
     my $hash = $defs{$name};
     my $i;
-    
+
     delete($hash->{helper}{RUNNING_PID});
 
     Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - helper disabled. abort" if ( $hash->{helper}{DISABLED} );
     return if ( $hash->{helper}{DISABLED} );
-    
+
     for ($i = 0; $i < ((scalar(@param) - 1) / 3); $i++) {
         my $targetHash = $defs{$param[1 + ($i * 3)]};
-        
+
         if ( "none" ne $param[3 + ($i * 3)] ) {
             Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - setting saved into hash: $param[3 + ($i * 3)]";
-        
+
             $hash->{helper}{$param[1 + ($i * 3)]} = $param[3 + ($i * 3)];
         }
-        
+
         Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - set readings batteryLevel and battery of device: $param[1 + ($i * 3)]";
-        
+
         if ( defined($targetHash) ) {
             readingsBeginUpdate( $targetHash );
             readingsBulkUpdate( $targetHash, "batteryLevel", $param[2 + ($i * 3)] );
@@ -348,7 +348,7 @@ sub BleTagBattery_BlockingDone($) {
     }
 
     Log3 $name, 4, "Sub BleTagBattery_BlockingDone ($name) - done";
-    
+
     return undef;
 }
 
@@ -357,9 +357,9 @@ sub BleTagBattery_BlockingAborted($) {
     my $name = $hash->{NAME};
 
     delete( $hash->{helper}{RUNNING_PID} );
-    
+
     Log3 $name, 3, "($name) Sub BleTagBattery_BlockingAborted - BlockingCall process terminated unexpectedly: timeout";
-    
+
     return undef;
 }
 
