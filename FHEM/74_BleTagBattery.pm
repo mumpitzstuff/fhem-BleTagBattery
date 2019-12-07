@@ -12,7 +12,7 @@ use strict;
 use warnings;
 use Blocking;
 
-my $version = "0.0.4";
+my $version = "0.0.5";
 
 
 # Declare functions
@@ -210,7 +210,7 @@ sub BleTagBattery_BlockingRun($) {
 
         $deviceList = fhem( "list $device", 1 );
 
-        if ( $deviceList =~ m/\s+STATE\s+present/ ) {
+        if ( $deviceList =~ m/\s+\d+-\d+-\d+\s+\d+:\d+:\d+\s+state\s+present/ ) {
             if ( $deviceList =~ m/device_name\s+(.+)/ ) {
                 $deviceName = $1;
 
@@ -281,7 +281,7 @@ sub BleTagBattery_readSensorValue($$$$) {
 
         if ( $result =~ /handle\:.*value\:(.*)/ ) {
             $value = $1;
-         } elsif ( $result =~ /Characteristic value\/descriptor\:(.*)/ ) {
+        } elsif ( $result =~ /Characteristic value\/descriptor\:(.*)/ ) {
             $value = $1;
         } else {
             $loop++;

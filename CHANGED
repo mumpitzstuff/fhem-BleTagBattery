@@ -1,4 +1,2 @@
- - state detection fixed (thx eispeer)
- - try only one time to reach the tag (reduced from 5)
- - timeout increased from 240 to 300
- - version increased from 0.0.3 to 0.0.4
+ - state detection fixed (reading used instead of internal)
+ - version increased from 0.0.4 to 0.0.5
